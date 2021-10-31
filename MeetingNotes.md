@@ -26,7 +26,7 @@ REQUIREMENTS
 - Documentation:
     - README:
         - Pair Programming goes in README (as we go)
-        - Program Design in README (at the end lmao)
+        - Program Design in README (at the end)
     - API Documentation:
         - Swagger? :)
 
@@ -37,5 +37,5 @@ TASKS: Due by 5am Wednesday
         - Deaths, Confirmed
     - Alex:
         - Active, Recovered 
-- Alex can do R4 (should be real easy lmao)
+- Alex can do R4 (should be real easy?)
 - R1: Jaak can do Daily Reports, Alex can do Time Series
