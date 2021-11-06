@@ -36,21 +36,20 @@ def deleteAll():
     return "success"
 
 @app.route('/timeSeries/addNewCSV', methods=['POST'])
-def postCSV():
+def postCSVTS():
     if request.method == 'POST':
         ## Call Post method
         pass
     return "success"
 
 @app.route('/timeSeries/viewAll', methods=['GET'])
-def view():
+def viewTS():
     if request.method == 'GET':
-        ## Call view method
-        pass
+        ts.viewData()
     return "success"
 
 @app.route('/timeSeries/deleteAll', methods=['DELETE'])
-def deleteAll():
+def deleteAllTS():
     if request.method == 'DELETE':
         ## Call delete method
         pass
