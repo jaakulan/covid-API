@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 import csv
 import pandas as pd
 from dailyReportTools import dailyCSV as nd
+from timeSeriesTools import timeseries as ts
 
 app = Flask(__name__)
 
@@ -33,6 +34,28 @@ def deleteAll():
     if request.method == 'DELETE':
         nd.deleteAllData()
     return "success"
+
+@app.route('/timeSeries/addNewCSV', methods=['POST'])
+def postCSV():
+    if request.method == 'POST':
+        ## Call Post method
+        pass
+    return "success"
+
+@app.route('/timeSeries/viewAll', methods=['GET'])
+def view():
+    if request.method == 'GET':
+        ## Call view method
+        pass
+    return "success"
+
+@app.route('/timeSeries/deleteAll', methods=['DELETE'])
+def deleteAll():
+    if request.method == 'DELETE':
+        ## Call delete method
+        pass
+    return "success"
+
 
 if __name__ == '__main__':
     app.debug =True
