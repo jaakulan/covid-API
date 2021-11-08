@@ -11,7 +11,13 @@ app.config['UPLOAD_FOLDER'] =  UPLOAD_FOLDER
 
 @app.route('/')
 def index():
-    return "hello" 
+    return "We need to put instructions here on how to use our backend."
+
+"""
+
+    DAILY FUNCTIONS BELOW
+
+"""
 
 #this will overwrite all databases and create a new database for daily csv file
 @app.route('/daily/addNewCSV', methods=['POST'])
@@ -29,17 +35,25 @@ def view():
         nd.viewData()
     return "success"
 
+
 @app.route('/daily/deleteAll', methods=['DELETE'])
 def deleteAll():
     if request.method == 'DELETE':
         nd.deleteAllData()
     return "success"
 
+"""
+
+    TIME SERIES FUNCTIONS BELOW
+
+"""
 @app.route('/timeSeries/addNewCSV', methods=['POST'])
 def postCSVTS():
     if request.method == 'POST':
-        ## Call Post method
-        pass
+        file = request.files['file']
+        data = pd.read_csv(file, header=[0])
+        dataDic = data.to_dict('records')
+        ts.addCSV(dataDic)
     return "success"
 
 @app.route('/timeSeries/viewAll', methods=['GET'])
@@ -51,8 +65,7 @@ def viewTS():
 @app.route('/timeSeries/deleteAll', methods=['DELETE'])
 def deleteAllTS():
     if request.method == 'DELETE':
-        ## Call delete method
-        pass
+        ts.deleteAllData()
     return "success"
 
 
