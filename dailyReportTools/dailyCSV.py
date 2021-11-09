@@ -51,10 +51,8 @@ class dbConnection:
             cur = self.db_conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
             cur.execute(
                 """
-                    DROP TABLE IF EXISTS dailyCases CASCADE;
-                    DROP SCHEMA IF EXISTS covidCases CASCADE;
-                    CREATE SCHEMA covidCases;
                     SET SEARCH_PATH TO covidCases;
+                    DROP TABLE IF EXISTS dailyCases CASCADE;    
                     CREATE TABLE dailyCases (
                         combined TEXT NOT NULL,
                         deaths INT NOT NULL,
@@ -66,8 +64,8 @@ class dbConnection:
                     );
                 """
                 )
-            cur.close()
             self.db_conn.commit()
+            cur.close()
             return True
         except pg.Error:
             print(cur.statusmessage)
@@ -86,8 +84,8 @@ class dbConnection:
                     (dataPoint['Combined_Key'], dataPoint['Deaths'], dataPoint['Confirmed'], dataPoint['Active'], dataPoint['Recovered'], dataPoint['Last_Update'])
                     )
                 print(cur.statusmessage)
-            cur.close()
             self.db_conn.commit()
+            cur.close()
             return True
         except pg.Error:
             print(cur.statusmessage)
@@ -102,7 +100,7 @@ class dbConnection:
                     
                     """
                     )
-            print(cur.statusmessage)
+            cur.statusmessage
             data = cur.fetchall()
             cur.close()
             self.db_conn.commit()
@@ -111,8 +109,11 @@ class dbConnection:
             print(cur.statusmessage)
             return False
         
+    def queryByComKey(self, query):
 
+        return
 
+        
 def getConnection():
     covid = dbConnection()
     covid.startConnection("fysyfysyrxbtwb", "c003474f786bc37b03b31d4f0377713a3a29becb8c9b111062db7ba496aa34e1", "ec2-3-228-134-188.compute-1.amazonaws.com", "5432", "dd5hvt80750lfu")
@@ -124,10 +125,11 @@ def newCSV(data):
     covid.insertNewData(data)
     covid.disconnect_db()
         
-def viewData():
+def viewData(data):
     covid = getConnection()
-    print(covid.viewAllData())
+    data = covid.viewAllData()
     covid.disconnect_db()
+    return data
 
 def deleteAllData():
     covid = getConnection()
