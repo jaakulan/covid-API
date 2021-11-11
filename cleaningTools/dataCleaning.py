@@ -32,7 +32,6 @@ def dateQuery(dateStart, dateEnd, dateSpecific):
         #this means dateStart or dateEnd both have queries and we will clean the duration
         if (len(dateStart) == 1 and len(dateEnd) == 1):
             cleanDates = checkDates([dateStart[0], dateEnd[0]])
-            print(cleanDates)
             if(cleanDates[0]):
                 #since dates are in iso format we can do direct comparison
                 if cleanDates[1][0] < cleanDates[1][1]:
@@ -81,3 +80,10 @@ def dataQuery(data):
         return [False, []]
     return [True, data]
 
+def validType(type):
+    if type == None:
+        return False
+    if type in ["json", "csv", "JSON", "CSV"]:
+        return True
+    else:
+        return False

@@ -109,7 +109,7 @@ class dbConnection:
     
     def viewAllData(self):
         try:
-            cur = self.db_conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+            cur = self.db_conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
             cur.execute(
                     """
                     SET SEARCH_PATH TO covidCases;
@@ -129,9 +129,7 @@ class dbConnection:
         
     def query(self, data, dates, countries, region, key):
         try:
-            print(data, dates, countries, region, key)
-            cur = self.db_conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-            
+            cur = self.db_conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) 
             cur.execute(
                     """
                     SET SEARCH_PATH TO covidCases;
@@ -146,8 +144,6 @@ class dbConnection:
             info = cur.fetchall()
             cur.close()
             self.db_conn.commit()
-            print("the info is ")
-            print(data, info)
             return info
         except pg.Error:
             print(cur.statusmessage)
@@ -172,7 +168,6 @@ class dbConnection:
 
     def updateWithData(self, data, date):
         try:
-            print("updating")
             cur = self.db_conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
             cur.execute(
                     """
@@ -203,7 +198,6 @@ class dbConnection:
                     """,
                     (dataPoint['Province_State'], dataPoint['Country_Region'], dataPoint['Combined_Key'], dataPoint['Deaths'], dataPoint['Confirmed'], dataPoint['Active'], dataPoint['Recovered'], date, dataPoint['Last_Update'])
                     )
-                print(cur.statusmessage)
             #sql query to get brand new cases or newly updated versions of cases
             cur.execute(
                 """
@@ -282,8 +276,9 @@ def getConnection():
 def newCSV(data, date):
     covid = getConnection()
     print("DB has restarted", covid.restartDB())
-    covid.insertNewData(data, date)
+    res = covid.insertNewData(data, date)
     covid.disconnect_db()
+    return res
         
 def viewData(data):
     covid = getConnection()
@@ -293,13 +288,15 @@ def viewData(data):
 
 def deleteAllData():
     covid = getConnection()
-    print(covid.restartDB())
+    res = covid.restartDB()
     covid.disconnect_db()
+    return res
 
 def resetAllData():
     covid = getConnection()
-    print(covid.resetAll())
+    res = covid.resetAll()
     covid.disconnect_db()
+    return res
 
 def queryData(data, dates, countries, region, key):
     covid = getConnection()
@@ -310,6 +307,7 @@ def queryData(data, dates, countries, region, key):
     key= keyString(key[1])
     data = covid.query(data, dates, countries, region, key)
     covid.disconnect_db()
+    return data
 
 def findDate(date):
     covid = getConnection()
@@ -322,25 +320,26 @@ def updateData(data, date):
     covid = getConnection()
 
     if findDate(date):
-        covid.updateWithData(data, date)
-        return
+        res = covid.updateWithData(data, date)
     else:
-        print("inserting only")
         #since data for date doesnt exist we can just add ontop of data
-        covid.insertNewData(data, date)
+        res = covid.insertNewData(data, date)
 
     covid.disconnect_db()
+    return res
 
 
 #########################################################__helper functions__#######################################
 
 def dataString(data):
+    if 'd' in data:
+        data.remove('d')
+        data.append("to_char(d, 'MM-DD-YYYY')")
     return ",".join(data)
 
 def dateString(dates):
     #3 cases
     length = len(dates)
-    print(dates)
     if(length==2):                                                           #case 1: two dates
         return "d >= '" +dates[0]+" 00:00:00'"+" AND d <= '"+dates[1]+" 23:59:59'"
     elif(length==1):                                                         #case 2: one date
