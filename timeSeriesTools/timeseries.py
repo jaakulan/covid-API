@@ -85,7 +85,7 @@ class dbConnection:
             for dataPoint in data:
 
                 #Create Combined Key
-                print(dataPoint)
+                #print(dataPoint)
                 if isinstance(dataPoint['Province/State'],str):
                     combined = str(dataPoint.pop('Province/State')) + str(dataPoint.pop('Country/Region'))
                 else:
@@ -97,11 +97,11 @@ class dbConnection:
                 dataPoint.pop('Lat')
                 dataPoint.pop('Long')
 
-                print(dataPoint)
-
+                #print(dataPoint)
 
 
                 for date in dataPoint:
+
                     cur.execute(
                         """
                         SET SEARCH_PATH TO covidCases;
@@ -109,14 +109,6 @@ class dbConnection:
                             ADD COLUMN IF NOT EXISTS " """+ date +""" " INTEGER;
                         """
                     )
-
-                    print("""
-                        UPDATE timeseriesconfirmed
-                            SET " """+ date +""" " = """+ str(dataPoint[date]) +"""
-                            WHERE combined = ' """+ combined +""" ';
-                        
-                        """)
-
                     cur.execute(
                         """
                         UPDATE timeseriesconfirmed
@@ -125,7 +117,7 @@ class dbConnection:
                         
                         """
                     )
-                    print(cur.statusmessage)
+                    #print(cur.statusmessage)
 
             cur.close()
             self.db_conn.commit()
