@@ -33,7 +33,8 @@ class dbConnection:
                         active INT NOT NULL,
                         recovered INT NOT NULL,
                         d TIMESTAMP NOT NULL,
-                        PRIMARY KEY (combined)
+                        lastUpdate TIMESTAMP NOT NULL,
+                        PRIMARY KEY (combined, d)
                     );
                 """
                 )
@@ -57,15 +58,16 @@ class dbConnection:
                     SET SEARCH_PATH TO covidCases;
                     DROP TABLE IF EXISTS dailyCases CASCADE;    
                     CREATE TABLE dailyCases (
-                        region TEXT NOT NULL,
-                        country TEXT NOT NULL,
+                        region TEXT,
+                        country TEXT,
                         combined TEXT NOT NULL,
                         deaths INT NOT NULL,
                         confirmed INT NOT NULL,
                         active INT NOT NULL,
                         recovered INT NOT NULL,
                         d TIMESTAMP NOT NULL,
-                        PRIMARY KEY (combined)
+                        lastUpdate TIMESTAMP NOT NULL,
+                        PRIMARY KEY (combined, d)
                     );
                 """
                 )
@@ -76,21 +78,28 @@ class dbConnection:
             print(cur.statusmessage)
             return False
     
-    def insertNewData(self, data)->bool:
+    def insertNewData(self, data, date)->bool:
         try:
             cur = self.db_conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
             for dataPoint in data:
-                print(dataPoint['Province_State'], dataPoint['Country_Region'])
                 cur.execute(
                     """
                     SET SEARCH_PATH TO covidCases;
                     Insert into dailyCases VALUES
-                    (%s, %s, %s, %s, %s, %s, %s, %s);
+                    (%s, %s, %s, %s, %s, %s, %s, %s, %s);
                     
                     """,
-                    (dataPoint['Province_State'], dataPoint['Country_Region'], dataPoint['Combined_Key'], dataPoint['Deaths'], dataPoint['Confirmed'], dataPoint['Active'], dataPoint['Recovered'], dataPoint['Last_Update'])
+                    (dataPoint['Province_State'], dataPoint['Country_Region'], dataPoint['Combined_Key'], dataPoint['Deaths'], dataPoint['Confirmed'], dataPoint['Active'], dataPoint['Recovered'], date, dataPoint['Last_Update'])
                     )
                 print(cur.statusmessage)
+            cur.execute(
+                """
+                SET SEARCH_PATH TO covidCases;
+                UPDATE dailyCases
+                SET region = NULL
+                WHERE region = 'NaN';
+                """
+                )
             self.db_conn.commit()
             cur.close()
             return True
@@ -100,12 +109,12 @@ class dbConnection:
     
     def viewAllData(self):
         try:
-            combined = "d = d"
             cur = self.db_conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
             cur.execute(
                     """
                     SET SEARCH_PATH TO covidCases;
-                    select * from dailyCases where """ +combined+ """ ;
+                    select region,country,combined,deaths,
+                    confirmed,active, recovered, to_char(d, 'MM-DD-YYYY'), to_char(lastUpdate, 'MM-DD-YYYY') from dailyCases;
                     
                     """
                     )
@@ -144,16 +153,136 @@ class dbConnection:
             print(cur.statusmessage)
             return False
 
+    def querydates(self):
+        try:
+            cur = self.db_conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+            cur.execute(
+                    """
+                    SET SEARCH_PATH TO covidCases;
+                    select to_char(d, 'MM-DD-YYYY') from dailyCases;
+                    """
+                    )
+            dates = cur.fetchall()
+            cur.close
+            self.db_conn.commit()
+            return dates
+        except pg.Error:
+            print(cur.statusmessage)
+            return False
+
+    def updateWithData(self, data, date):
+        try:
+            print("updating")
+            cur = self.db_conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+            cur.execute(
+                    """
+                    CREATE SCHEMA IF NOT EXISTS covidCases;
+                    SET SEARCH_PATH TO covidCases;
+                    DROP TABLE IF EXISTS extraDailyCases CASCADE;
+                    CREATE TABLE IF NOT EXISTS extraDailyCases (
+                        region TEXT NOT NULL,
+                        country TEXT NOT NULL,
+                        combined TEXT NOT NULL,
+                        deaths INT NOT NULL,
+                        confirmed INT NOT NULL,
+                        active INT NOT NULL,
+                        recovered INT NOT NULL,
+                        d TIMESTAMP NOT NULL,
+                        lastUpdate TIMESTAMP NOT NULL,
+                        PRIMARY KEY (combined, d)
+                    );
+                """
+                    )
+            for dataPoint in data:
+                cur.execute(
+                    """
+                    SET SEARCH_PATH TO covidCases;
+                    Insert into extraDailyCases VALUES
+                    (%s, %s, %s, %s, %s, %s, %s, %s, %s);
+                    
+                    """,
+                    (dataPoint['Province_State'], dataPoint['Country_Region'], dataPoint['Combined_Key'], dataPoint['Deaths'], dataPoint['Confirmed'], dataPoint['Active'], dataPoint['Recovered'], date, dataPoint['Last_Update'])
+                    )
+                print(cur.statusmessage)
+            #sql query to get brand new cases or newly updated versions of cases
+            cur.execute(
+                """
+                SET SEARCH_PATH TO covidCases;
+                select * from extraDailyCases 
+                    where combined not in (select combined from dailyCases) 
+                    OR
+                    d not in (select d from dailyCases);
+                    """
+            )
+            #add compeletly new info into the db so its new set of (combined, d)
+            cur.execute(
+                    """
+                    SET SEARCH_PATH TO covidCases;
+                    Insert INTO dailyCases
+                    select * from extraDailyCases 
+                    where combined not in (select combined from dailyCases) 
+                    OR
+                    d not in (select d from dailyCases);
+                    """
+                    )
+            #update already existing info into the db if the info is more recent by the last updated section
+            cur.execute(
+                    """
+                    UPDATE dailyCases
+                    SET deaths = extraDailyCases.deaths,
+                        confirmed = extraDailyCases.confirmed,
+                        active = extraDailyCases.active,
+                        recovered = extraDailyCases.recovered,
+                        lastUpdate = extraDailyCases.lastUpdate
+                    From extraDailyCases
+                    WHERE dailyCases.combined = extraDailyCases.combined
+                    AND dailyCases.d = extraDailyCases.d
+                    AND dailyCases.lastUpdate < extraDailyCases.lastUpdate;
+                    DROP TABLE IF EXISTS extraDailyCases;
+                    """
+                    )
+            cur.execute(
+                """
+                SET SEARCH_PATH TO covidCases;
+                UPDATE dailyCases
+                SET region = NULL
+                WHERE region = 'NaN';
+                """
+                )
+            print(cur.statusmessage)
+            cur.close
+            self.db_conn.commit()
+            return True
+        except pg.Error:
+            print(cur.statusmessage)
+            return False
+
+    def resetAll(self):
+        try:
+            cur = self.db_conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+            cur.execute(
+                    """
+                    DROP SCHEMA IF EXISTS covidCases CASCADE;
+                    CREATE SCHEMA IF NOT EXISTS covidCases; 
+                    """
+                    )
+            cur.close
+            self.db_conn.commit()
+            return True
+        except pg.Error:
+            print(cur.statusmessage)
+            return False
+
         
 def getConnection():
     covid = dbConnection()
     covid.startConnection("fysyfysyrxbtwb", "c003474f786bc37b03b31d4f0377713a3a29becb8c9b111062db7ba496aa34e1", "ec2-3-228-134-188.compute-1.amazonaws.com", "5432", "dd5hvt80750lfu")
     return covid
 
-def newCSV(data):
+def newCSV(data, date):
     covid = getConnection()
     print("DB has restarted", covid.restartDB())
-    covid.insertNewData(data)
+    covid.insertNewData(data, date)
     covid.disconnect_db()
         
 def viewData(data):
@@ -167,16 +296,41 @@ def deleteAllData():
     print(covid.restartDB())
     covid.disconnect_db()
 
+def resetAllData():
+    covid = getConnection()
+    print(covid.resetAll())
+    covid.disconnect_db()
+
 def queryData(data, dates, countries, region, key):
     covid = getConnection()
     data = dataString(data[1])
-    print(dates)
     dates = dateString(dates[1])
     countries = countryString(countries[1])
     region = regionString(region[1])
     key= keyString(key[1])
     data = covid.query(data, dates, countries, region, key)
     covid.disconnect_db()
+
+def findDate(date):
+    covid = getConnection()
+    dates = covid.querydates()
+    covid.disconnect_db()
+    dates = [item for sublist in dates for item in sublist]
+    return date in dates[0]
+
+def updateData(data, date):
+    covid = getConnection()
+
+    if findDate(date):
+        covid.updateWithData(data, date)
+        return
+    else:
+        print("inserting only")
+        #since data for date doesnt exist we can just add ontop of data
+        covid.insertNewData(data, date)
+
+    covid.disconnect_db()
+
 
 #########################################################__helper functions__#######################################
 

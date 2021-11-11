@@ -15,9 +15,20 @@ def index():
 def postCSV():
     if request.method == 'POST':
         file = request.files['file']
+        fileDate = file.filename.split(".")[0]
         data = pd.read_csv(file, header = [0])
         dataDic = data.to_dict('records')
-        nd.newCSV(dataDic)
+        print(nd.newCSV(dataDic,fileDate))
+    return "sucess \n" + data.to_string()
+
+@app.route('/daily/updateWithCSV', methods=['PATCH'])
+def patchCSV():
+    if request.method == 'PATCH':
+        file = request.files['file']
+        fileDate = file.filename.split(".")[0]
+        data = pd.read_csv(file, header = [0])
+        dataDic = data.to_dict('records')
+        print(nd.updateData(dataDic, fileDate))
     return "sucess \n" + data.to_string()
 
 @app.route('/daily/viewAll', methods=['GET'])
@@ -32,6 +43,12 @@ def view():
 def deleteAll():
     if request.method == 'DELETE':
         nd.deleteAllData()
+    return "success"
+
+@app.route('/deleteDB', methods=['DELETE'])
+def deleteDB():
+    if request.method == 'DELETE':
+        nd.resetAllData()
     return "success"
 
 @app.route('/daily/info', methods=['GET'])

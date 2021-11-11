@@ -22,7 +22,7 @@ def dateQuery(dateStart, dateEnd, dateSpecific):
             if(cleanDates[0]):
                 return [True, dateSpecific]
             else:
-                return [False, cleanDates[1] + " is an incorrect data format, should be YYYY-MM-DD"]
+                return [False, cleanDates[1] + " is an incorrect data format, should be MM-DD-YYYY"]
         elif len(dateSpecific) == 0:
             # because no dates were specified
             return [True, []] 
@@ -40,7 +40,7 @@ def dateQuery(dateStart, dateEnd, dateSpecific):
                 else:
                     return [False, "The start date needs to have occured before entered the end date"]
             else:
-                return [False, cleanDates[1] + " is an incorrect data format, should be YYYY-MM-DD"]
+                return [False, cleanDates[1] + " is an incorrect data format, should be MM-DD-YYYY"]
         else:
             return [False, "Incorrect amount of dates entered for dateStart/dateEnd, Or missing date for one of those parameters!"]
     else:
@@ -54,17 +54,17 @@ def checkDates(dates):
 
 def checkValidDate(date):
     try:
-        datetime.datetime.strptime(date, '%Y-%m-%d')
+        datetime.datetime.strptime(date, '%m-%d-%Y')
         return True
     except:
-        return False # "Incorrect data format, should be YYYY-MM-DD"]
+        return False # "Incorrect data format, should be MM-DD-YYYY"]
 
 def dataQuery(data):
     #get rid of repeated data queries
     data = list(set(data))
     length = len(data)
     #return null if data contains illegal queries
-    legal = ['deaths', 'confirmed', 'active', 'recovered']
+    legal = ['deaths', 'confirmed', 'active', 'recovered', 'region', 'country', 'combined', 'd', 'lastupdate']
     illegal = []
     
 
