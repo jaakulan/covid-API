@@ -77,13 +77,13 @@ def dataQuery(data):
         illegalQuery = ", ".join(illegal)
         return [False, "Illegal data queries entered : "+ illegalQuery]
     elif len(data)<1:
-        return [False, []]
+        return [False, "Must Specify at least one data query!"]
     return [True, data]
 
-def validType(type):
-    if type == None:
+def validType(format):
+    if format == None:
         return False
-    if type in ["json", "csv", "JSON", "CSV"]:
+    if format in ["json", "csv", "JSON", "CSV"]:
         return True
     else:
         return False

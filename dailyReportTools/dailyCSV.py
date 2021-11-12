@@ -18,7 +18,6 @@ class dbConnection:
                                         host=host,
                                         port=port,
                                         database=database)
-            print("you are connected to database")
             cur = self.db_conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
             cur.execute(
                 """
@@ -46,7 +45,6 @@ class dbConnection:
     def disconnect_db(self):
         try:
             self.db_conn.close()
-            print("disconnected")
         except pg.Error:
             print("error disconnecting")
 
@@ -134,8 +132,8 @@ class dbConnection:
                     """
                     SET SEARCH_PATH TO covidCases;
                     select """ +data+ """ from dailyCases
-                    where (""" +key+ """ Or
-                    """ +countries+ """ Or
+                    where (""" +key+ """) and
+                    (""" +countries+ """ Or
                     """ +region+ """) and
                     """ +dates+ """;
                     """
@@ -222,6 +220,7 @@ class dbConnection:
             #update already existing info into the db if the info is more recent by the last updated section
             cur.execute(
                     """
+                    SET SEARCH_PATH TO covidCases;
                     UPDATE dailyCases
                     SET deaths = extraDailyCases.deaths,
                         confirmed = extraDailyCases.confirmed,
@@ -303,6 +302,7 @@ def queryData(data, dates, countries, region, key):
     data = dataString(data[1])
     dates = dateString(dates[1])
     countries = countryString(countries[1])
+    print(countries)
     region = regionString(region[1])
     key= keyString(key[1])
     data = covid.query(data, dates, countries, region, key)

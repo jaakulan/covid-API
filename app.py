@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return "hello" 
+    return "Welcome to Jaakulan and Alexandra's Covid Api!" 
 
 #this will overwrite all databases and create a new database for daily csv file
 @app.route('/daily/addNewCSV', methods=['POST'])
@@ -20,7 +20,7 @@ def postCSV():
         data = pd.read_csv(file, header = [0])
         dataDic = data.to_dict('records')
         if nd.newCSV(dataDic,fileDate):
-            return "sucess"
+            return "success"
         else:
             return "Unexpected failure, please check connection or database"
     else:
@@ -34,7 +34,7 @@ def patchCSV():
         data = pd.read_csv(file, header = [0])
         dataDic = data.to_dict('records')
         if nd.updateData(dataDic, fileDate):
-            return "sucess \n" + data.to_string()
+            return "success"
         else:
             return "Unexpected failure, please check connection or database"
     else:
@@ -44,11 +44,11 @@ def patchCSV():
 def view():
     if request.method == 'GET':
         data = []
-        type=request.args.get('type')
-        if(clean.validType(type)):
+        format=request.args.get('type')
+        if(clean.validType(format)):
             data = nd.viewData(data)
             data = json.dumps(data)
-            if(type == 'json' or type=='JSON'):
+            if(format == 'json' or format =='JSON'):
                 return data
             else:
                 data = pd.read_json(data)
@@ -94,11 +94,11 @@ def getInfo():
         dates = clean.dateQuery(dateStart, dateEnd, dateSpecific)
         validityCheck = clean.infoValidity(data, dates, countries, region, key)
         if validityCheck[0]:
-            type=request.args.get('type')
-            if(clean.validType(type)):
+            format=request.args.get('type')
+            if(clean.validType(format)):
                 data = nd.queryData(data, dates, countries, region, key)
                 data = json.dumps(data)
-                if(type == 'json' or type=='JSON'):
+                if(format == 'json' or format=='JSON'):
                     return data
                 else:
                     data = pd.read_json(data)
