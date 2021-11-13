@@ -34,10 +34,6 @@ class dbConnection:
                                       database=database)
             print("you are connected to database")
 
-            ### DELETE THIS BEFORE SUBMISSION
-            #self.hardResetDB()
-            ###
-
             self.db_conn.commit()
         except (Exception, Error) as error:
             print("Error while connecting to PostgreSQL", error)
@@ -49,7 +45,7 @@ class dbConnection:
         except pg.Error:
             print("error disconnecting")
 
-    def hardResetDB(self) -> bool:
+    def hardResetTable(self) -> bool:
         try:
             cur = self.db_conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
             print(cur.execute(
@@ -79,13 +75,14 @@ class dbConnection:
             print(cur.statusmessage)
             return False
 
-    def insertNewData(self, data) -> bool:
+    def insertData(self, data) -> bool:
         try:
             cur = self.db_conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-            for dataPoint in data:
+
+            # For each line in the csv file (each country)
+            for count, dataPoint in enumerate(data):
 
                 #Create Combined Key
-                #print(dataPoint)
                 if isinstance(dataPoint['Province/State'],str):
                     combined = str(dataPoint.pop('Province/State')) + str(dataPoint.pop('Country/Region'))
                 else:
@@ -93,22 +90,23 @@ class dbConnection:
                     combined = dataPoint.pop('Country/Region')
                 combined = ''.join(c for c in combined if c.isalnum())
 
-                #Get rid of extra infom
+                #Get rid of extra information
                 dataPoint.pop('Lat')
                 dataPoint.pop('Long')
 
-                #print(dataPoint)
+                if count == 0:
+                    for date in dataPoint:
+                        cur.execute(
+                            """
+                            SET SEARCH_PATH TO covidCases;
+                            ALTER TABLE timeseriesconfirmed
+                                ADD COLUMN IF NOT EXISTS " """ + date + """ " INTEGER;
+                            """
+                        )
 
-
+                # For each date/confirmed associated with that country
                 for date in dataPoint:
 
-                    cur.execute(
-                        """
-                        SET SEARCH_PATH TO covidCases;
-                        ALTER TABLE timeseriesconfirmed
-                            ADD COLUMN IF NOT EXISTS " """+ date +""" " INTEGER;
-                        """
-                    )
                     cur.execute(
                         """
                         UPDATE timeseriesconfirmed
@@ -117,7 +115,6 @@ class dbConnection:
                         
                         """
                     )
-                    #print(cur.statusmessage)
 
             cur.close()
             self.db_conn.commit()
@@ -126,23 +123,50 @@ class dbConnection:
             print(cur.statusmessage)
             return False
 
+    def query_confirmed(self, date, combined):
+        try:
+            cur = self.db_conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+            if date == None:
+                cur.execute(
+                    """
+                    SET SEARCH_PATH TO covidCases;
+                    SELECT * from timeseriesconfirmed;
+                    """
+                )
+            else:
+
+                cur.execute(
+                    """
+                    SET SEARCH_PATH TO covidCases;
+                    SELECT combined, " """+ date +""" " from timeseriesconfirmed;
+                    """
+                )
+            return cur.fetchall()
+            
+            
+        except pg.Error:
+            print(cur.statusmessage)
+            return False
+
+
     def viewAllData(self):
         pass
+
+
 
 """
     REQUEST FUNCTIONS
 """
 def addCSV(data):
     covid = getConnection()
-    covid.insertNewData(data)
+    covid.insertData(data)
     covid.disconnect_db()
 
 def newCSV(data):
     covid = getConnection()
-    print("DB has restarted", covid.hardResetDB())
-    # covid.insertNewData(data)
+    print(covid.hardResetTable())
+    covid.insertData(data)
     covid.disconnect_db()
-
 
 def viewData():
     covid = getConnection()
@@ -152,9 +176,22 @@ def viewData():
 
 def deleteAllData():
     covid = getConnection()
-    print(covid.hardResetDB())
+    print(covid.hardResetTable())
     covid.disconnect_db()
 
+def query(type:str, date:str, combined:str):
+    covid = getConnection()
+    result = "ERROR INCORRECT QUERY"
+    print("Type:",type,"Date:",date)
+    if type == "deaths":
+        pass
+    elif type == "confirmed":
+        result = covid.query_confirmed(date, combined)
+    elif type == "recovered":
+        pass
+    covid.disconnect_db()
+    return result
+    
 """
     HELPER FUNCTIONS
 """

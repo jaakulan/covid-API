@@ -27,7 +27,7 @@
 
 ###STATUS:
 Alexandra:
-   - TimeSeries R1 + R2 Completed
+   - Couldn't figure out how to dodge string concatenation (tried using the execute's string formatting.
 
 Jaak:
    - DailyReports R1 Complete
@@ -53,3 +53,5 @@ Jaak:
    - 2:30pm Wednesday
    Status update + what we need to do + make sure we sent extension request
    Have majority code done.
+   
+### Questions:
