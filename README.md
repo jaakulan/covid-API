@@ -23,12 +23,12 @@ Jaakulan had written a few tests and showed Alexandra the tools she needs to wri
 After Alexandra had some guidance from Jaakulan on how to turn Postman requests into requests used in unittests, she was able to apply the same formula of creating the request, sending the request and comparing the output she expected to other queries, adding files and updating databases.
 
 ## Design Process
-##### &nbsp;&nbsp; How to represent objects
+##### &nbsp;&nbsp; How to Represent Objects
  - CSV data 
     - to hold the csv data we thought  of sending it in as a post request where we can later store in a SQL table, we chose sql over NOsql as sql would be easier to run more complex queries and also since we didn't need to store strings, it seemed like a better choice than NOsql.  
  - Queries
     - to create queries from the endpoints we wanted to use query params from the HTTP GET request. We thought this was a better way to create queries with because we can easily manipulate the data wanted in the URL and felt many searches, even in search engines such as Google uses them as well. Also since the queries didn't contain any sensitive information it would be a great choice for query params for the ease and speed of using them.
-##### &nbsp;&nbsp; The relationships between objects (coupling, cohesion)
+##### &nbsp;&nbsp; The Relationships between Objects (Coupling, Cohesion)
  - Cohesion
     - We had very high cohesion to easily organize all the functions and abstract the information
     - We decided to have the flask server, connected to a cleaning module, which cleaned the queries and a class for the actual queries themselves. The class for the queries had getter and setter kind of functions for the queries where the info given by the server was formatted in a way that the getter and setter can easily interpret and send the appropriate response back.
@@ -44,11 +44,30 @@ After Alexandra had some guidance from Jaakulan on how to turn Postman requests 
      - Daily Reports uses the prefix '/daily' for all requests to specify the info needs to come from daily report csv's
      ex. "/daily/addNewCSV". The following are the suffixes that follow for the different endpoints:
         - /addNewCSV
+          - Requires a file upload in the format of daily reports.
         - /updateWithCSV
+          - Requires a file upload in the format of daily reports.
         - /viewAll
-        - /deleteAll
+          - Requires a type of file (either 'json' or 'csv')
         - /info
-    - The API would send these requests to the backend which was connected to a SQL server. We chose SQL over NoSQL for reasons mentioned above in representation of objects for queries. The SQL server was postgreSQL because both partners had previous experience with this database as it was taught in our "Intro to Databases Course" (CSC343). The module we used to create sql statements and send the to the server was psycopg2, which was also because of previous experience for both partners, and was very easy to use, as the SQL statements could be run in a PSQL shell then easily copied for our module to run in the backend.
+          - Requires a type of file (either 'json' or 'csv')
+          - One other option parameter must be included (else use viewAll)
+          - Optional parameters are data, one date, a range of dates, country 
+        - /deleteAll
+     - Time Series Reports uses the prefix '/timeSeries' for all requests to specify the info needs to come from daily report csv's
+     ex. "/timeSeries/addNewCSV". The following are the suffixes that follow for the different endpoints:
+        - /addNewCSV
+          - Requires the type of timeseries (either 'deaths', 'confirmed', 'recovered')
+          - Requires a file upload in the format of a time series.
+        - /updateWithCSV
+            - Requires the type of timeseries (either 'deaths', 'confirmed', 'recovered')
+            - Requires a file upload in the format of a time series.
+        - /viewAll
+            - Requires the type of timeseries (either 'deaths', 'confirmed', 'recovered')
+        - /info
+            - Requires the type of timeseries (either 'deaths', 'confirmed', 'recovered')
+            - Optional parameters are country, date
+    - The API would send these requests to the backend which was connected to a SQL server. We chose SQL over NoSQL for reasons mentioned above in representation of objects for queries. The SQL server was PostgreSQL because both partners had some previous experience with this database as it was taught in the course "Intro to Databases Course" (CSC343). The module we used to create SQL statements and send the to the server was psycopg2, which was also because of previous experience for both partners, and was very easy to use, as the SQL statements could be run in a PSQL shell then easily copied for our module to run in the backend.
     - After recieving the data back from the database our API sends a response either as a CSV or JSON using the module json or panda's dataframe to csv conversion. If the data was not possible to get or a bad query was put in the params the API would respond with an error message.
  - Design of functions
    - We designed the functions in our flask app to handle HTTP requests and followed the REST API guidelines from class.
