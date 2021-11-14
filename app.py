@@ -1,12 +1,9 @@
-from flask import Flask, request, jsonify
-import csv
+from flask import Flask, request
 import pandas as pd
 import json
 from dailyReportTools import dailyCSV as nd
 from timeSeriesTools import timeseries as ts
 from cleaningTools import dataCleaning as clean
-
-
 
 app = Flask(__name__)
 
