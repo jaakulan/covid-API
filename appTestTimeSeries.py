@@ -8,8 +8,8 @@ URL = 'http://127.0.0.1:5000/timeSeries'
 SHRUNK_URL = 'http://127.0.0.1:5000'
 
 """
-URL = 'https://uoftcovidapi.herokuapp.com/timeSeries'
-SHRUNK_URL = 'https://uoftcovidapi.herokuapp.com'
+URL = 'https://covidjaakalex.ue.r.appspot.com/timeSeries'
+SHRUNK_URL = 'https://covidjaakalex.ue.r.appspot.com'
 q_setup = False
 
 
