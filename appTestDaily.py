@@ -4,13 +4,15 @@ import unittest
 from app import app
 
 
-"""
-URL = 'https://uoftcovidapi.herokuapp.com/daily'
-SHRUNK_URL = 'https://uoftcovidapi.herokuapp.com'
-"""
 
+URL = 'https://covidjaakalex.ue.r.appspot.com/daily'
+SHRUNK_URL = 'https://covidjaakalex.ue.r.appspot.com/'
+
+
+"""
 URL = 'http://127.0.0.1:5000/daily'
 SHRUNK_URL = 'http://127.0.0.1:5000'
+"""
 
 q_setup = False
 
@@ -46,6 +48,7 @@ class FlaskTest(unittest.TestCase):
         response = requests.post(URL+'/addNewCSV', files=files)
         response = requests.get(URL+'/viewAll?type=json')
         files.get('file').close()
+        print(response.text)
         correctText = '[{"region": null, "country": "Afghanistan", "combined": "Afghanistan", "deaths": 2201, "confirmed": 52513, "active": 0, "recovered": 41727, "to_char": "01-02-2021"}, {"region": null, "country": "Albania", "combined": "Albania", "deaths": 1181, "confirmed": 58316, "active": 23501, "recovered": 33634, "to_char": "01-02-2021"}, {"region": null, "country": "Algeria", "combined": "Algeria", "deaths": 2762, "confirmed": 99897, "active": 29740, "recovered": 67395, "to_char": "01-02-2021"}, {"region": null, "country": "Andorra", "combined": "Andorra", "deaths": 84, "confirmed": 8117, "active": 570, "recovered": 7463, "to_char": "01-02-2021"}]'
         self.assertEqual(correctText, response.text, "Should be "+ correctText)
 
@@ -114,7 +117,9 @@ class FlaskTest(unittest.TestCase):
             setup_queries(self)
             q_setup = True
 
+        
         response = requests.get(URL + '/info?type=json')
+        print(response.text)
         correctText = "Must Specify at least one data query!"
         self.assertEqual(correctText, response.text, "For query with only type, Should be "+ correctText)
 
@@ -186,6 +191,7 @@ class FlaskTest(unittest.TestCase):
             setup_queries(self)
             q_setup = True
 
+        print(URL +'/info?type=json&date=12121&data=deaths' )
         response = requests.get(URL + '/info?type=json&date=12121&data=deaths')
         correctText = '12121 is an incorrect data format, should be MM-DD-YYYY'
         self.assertEqual(correctText, response.text, "For query with wrong date, Should be "+ correctText)
