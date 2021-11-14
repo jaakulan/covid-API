@@ -1,0 +1,13 @@
+with only type
+
+with type and data
+
+with type and data and specific date
+
+with type and data and range of dates
+
+with type and data and range of dates and country
+
+with wrong type
+with wrong date format
+with country that doesnt exist

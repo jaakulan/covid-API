@@ -1,0 +1,7 @@
+FIPS,Admin2,Province_State,Country_Region,Last_Update,Lat,Long_,Confirmed,Deaths,Recovered,Active,Combined_Key,Incident_Rate,Case_Fatality_Ratio
+,,,Afghanistan,2021-01-03 05:22:33,33.93911,67.709953,5,2,41,0,Afghanistan,0,4.252222179
+,,,Albania,2021-01-03,41.1533,20.1683,58316,1181,334,201,Albania,2026.409062,2.025173194
+,,,Algeria,2021-01-03,28.0339,1.6596,99897,2762,395,0,Algeria,227.8098608,2.764847793
+,,Tasmania,Australia,2021-01-02 05:22:33,-42.8821,147.3272,0,0,01,0,"Tasmania, Australia",43.69747899,5.555555556
+,,Victoria,Australia,2021-01-02 04:22:33,-37.8136,144.9631,0,0,30,20,"Victoria, Australia",307.5159505,4.02197371
+
