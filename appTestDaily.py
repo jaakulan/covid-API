@@ -1,13 +1,16 @@
-try:
-    import requests
-    from flask.wrappers import Response
-    import unittest 
-    from app import app
-except Exception as e:
-    print("Some Modules are Missing {} ".format(e))
+import requests
+from flask.wrappers import Response
+import unittest
+from app import app
 
-URL = 'http://127.0.0.1:5000/daily'
+
+"""
+URL = 'http://127.0.0.1:5000/timeSeries'
 SHRUNK_URL = 'http://127.0.0.1:5000'
+
+"""
+URL = 'https://uoftcovidapi.herokuapp.com/timeSeries'
+SHRUNK_URL = 'https://uoftcovidapi.herokuapp.com'
 q_setup = False
 
 
