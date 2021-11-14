@@ -1,9 +1,4 @@
-First Meeting:
-
-- Node + Express
-- Heroku
-
-REQUIREMENTS
+###REQUIREMENTS
 - R1: 
     - Add new Data Files (/time_series/ + /daily_reports/)
 - R2:
@@ -30,12 +25,33 @@ REQUIREMENTS
     - API Documentation:
         - Swagger? :)
 
-TASKS: Due by 5am Wednesday
-- Jaak can set up folder structure
-- Start with Query stuff
-    - Jaak:
-        - Deaths, Confirmed
-    - Alex:
-        - Active, Recovered 
-- Alex can do R4 (should be real easy?)
-- R1: Jaak can do Daily Reports, Alex can do Time Series
+###STATUS:
+Alexandra:
+   - Couldn't figure out how to dodge string concatenation (tried using the execute's string formatting.
+
+Jaak:
+   - DailyReports R1 Complete
+   - DailyReports R3 Deaths/Confirmed/Active/Recovered Complete by single days/between days
+    
+###GOALS
+Alexandra:
+   - Ask q's from important
+   - Query Data. (Confirmed by day, confirmed by country, (?) confirmed by day between certain dates)
+   - Reuse functions for Deaths, Recovered
+   - Return data as types CSV/JSON.
+   - Swagger? (maybe sooner rather than later)
+   - Efficiency.
+   - Testing.
+   
+Jaak:
+   - Finish Queries (R3)
+   - Updating data file
+   - Return data type CSV/JSON
+   - Testing
+
+### Meeting Times
+   - 2:30pm Wednesday
+   Status update + what we need to do + make sure we sent extension request
+   Have majority code done.
+   
+### Questions:
