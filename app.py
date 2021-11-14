@@ -222,7 +222,6 @@ def getInfots():
                 combined = ''.join(c for c in combined if c.isalnum())
 
         return json.dumps(ts.query(date, combined,datatypels[0]))
-        #return jsonify(ts.query(typerls[0], date, combined))
 
 
     else:

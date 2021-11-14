@@ -1,17 +1,28 @@
 ## Pair Programming Challenges and Solutions
-##### Challenge: 
-Jaakulan is a novice at SQL queries especially the various methods on joining table together, so when updating his tables with new CSV info, the results were undesirable. For instance, when updating with data that already existed but was newly updated on the CSV that was being uploaded, the newly updated data did not appear.
-##### Solution:
-Alexandra peer-programmed with Jaakulan on a PSQL shell and showed him the errors he was making. She also showed him the various methods Jaakulan should think about when using SQL such as creating two tables and subtracting to get the differences which was very helpful in updating tables.
+##### Challenge 1: 
+Jaakulan is a novice at PostgreSQL queries especially the various methods on joining table together, so when updating his tables with new CSV info, the results were undesirable. For instance, when updating with data that already existed but was newly updated on the CSV that was being uploaded, the newly updated data did not appear.
+##### Solution 1:
+Alexandra was the driver in a peer-programming session with Jaakulan on a PSQL shell and showed him the errors he was making. She was able to teach him commands like "\dt, \dt, INSERT, UPDATE, ALTER" and how to set schema paths. She also showed him the various methods Jaakulan should think about when using SQL such as creating two tables and subtracting to get the differences which was very helpful in updating tables.
+##### Reflection 1:
+After Alexandra helped Jaakulan with PostgreSQL in correlation to this assignement, Jaakulan was able to help make better queries into the database he had created. He was able to take this thoughts on how to construct tables and apply that logic in properly creating and updating a table in the joint database.
 
+##### Challenge 2: 
+Jaakulan was inserting data that was completely new and additional to the data that already existed. He noticed that when he inserted the data, the run time was extremely long, this was a major problem especially in the testing cases where we insert only completely new data and alot of it.
+##### Solution 2:
+Alexandra looked through Jaakulan's code for updating a table and they found that the run time was increasing for the individual insert statements and parsing with Python with each data point. She showed him a way to manipulate the data using an extra table and then inserting the non-existent data into the original table that is show cased for the queries. The extra table was then dropped. She told him that when we sacrifice the space complexity by using the extra table, we can exponentially increase run-time by using SQL tables which are much faster due to the way these tables store data.
+##### Reflection 2:
+Jaakulan was able to learn something new about both how taxing PostgreSQL insert statements can be over a large database, but also how to batch his inserts into new table, so that he only making one modification for his updating functions.
 
-##### Challenge: 
-Jaakulan was inserting data that was completly new and addition to the data that already existed. He noticed that when he inserted the data, the run time was extremly long, this was a major problem especially in the testing cases where we insert only completly new data and alot of it.
-##### Solution:
-Alexandra looked through Jaakulan's update code with him and found that he was increasing run time for the individual insert statements and parsing with python with each data point. She showed him a way to manipulate the data using an extra table and then inserting the non-existent data into the original table that is show cased for the queries. The extra table was then dropped. She told him that when we sacrifice the space complexity using the extra table we can exponentially increase run-time by using SQL tables which are much faster due to the way these tables store data.
+##### Challenge 3:
+Alexandra did not know how to make tests for her API requests. She knew only how to send her requests though Postman, because that's what she saw in class. However, she didn't know how to start writing tests for her post requests for testing.
 
-## Reflection
-#### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Design Process
+##### Solution 3:
+Jaakulan had written a few tests and showed Alexandra the tools she needs to write tests. Jaakulan had used a library called "requests" on Python and was able to open files from a folder called "csvExamples" first into Python and then to the server with the requests library. Alexandra listened to Jaakulan explain the tools she needs. From there, they paired programmed a query Alexandra had wrote in Postman and send that same request through a test.
+
+##### Reflection 3:
+After Alexandra had some guidance from Jaakulan on how to turn Postman requests into requests used in unittests, she was able to apply the same formula of creating the request, sending the request and comparing the output she expected to other queries, adding files and updating databases.
+
+## Design Process
 ##### &nbsp;&nbsp; How to represent objects
  - CSV data 
     - to hold the csv data we thought  of sending it in as a post request where we can later store in a SQL table, we chose sql over NOsql as sql would be easier to run more complex queries and also since we didn't need to store strings, it seemed like a better choice than NOsql.  
